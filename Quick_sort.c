@@ -1,9 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<math.h>
-#include<sys/wait.h>
-#include<sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <math.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <limits.h>
+#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 void swap(int *a, int *b)
 {
@@ -11,6 +17,12 @@ void swap(int *a, int *b)
 	*a = *b;
 	*b = temp;
 	return ;
+}
+int * shareMemory_Allocator(size_t size)
+{
+    key_t mem_key = IPC_PRIVATE;
+    int shm_id = shmget(mem_key, size, IPC_CREAT | 0666);
+    return (int*)shmat(shm_id, NULL, 0);
 }
 int partition(int *arr,int left ,int right)
 {
@@ -47,7 +59,7 @@ void concurrent_quicksort(int * arr,int left,int right)
 		* }
 		*/
 		int pivot = rand() % (right - left  + 1) + left;
-		swap(&a[right], &a[pivot]);
+		swap(&arr[right], &arr[pivot]);
 		int p = partition(arr, left, right);
 		int left_sort_pid = fork();
 		if(left_sort_pid == 0)
@@ -79,7 +91,7 @@ int main()
 	printf("give the size\n");
 	scanf("%d",&n);
 
-	arr = (int *)malloc(n*sizeof(int));
+	arr = (int *)shareMemory_Allocator(n*sizeof(int));
 	printf("give the elements\n");
 	for(int i=0;i<n;i++)
 		scanf("%d",arr+i);
