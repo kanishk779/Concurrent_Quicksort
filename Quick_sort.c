@@ -26,6 +26,12 @@ int partition(int *arr,int left ,int right)
 	swap(arr+key+1,arr+right);
 	return key+1;
 }
+int randomized_partition(int *arr,int left,int right)
+{
+	int random = rand()%(right-left+1);
+	swap(arr+right,arr+left+random);
+	return partition(arr,left,right);
+}
 void quicksort(int *arr, int left, int right)
 {
 	if(left < right)
@@ -33,6 +39,15 @@ void quicksort(int *arr, int left, int right)
 		int pivot = partition(arr,left,right);
 		quicksort(arr,left,pivot-1);
 		quicksort(arr,pivot+1,right);
+	}
+}
+void randomized_quicksort(int *arr,int left ,int right)
+{
+	if(left < right)
+	{
+		int pivot = randomized_partition(arr,left,right);
+		randomized_quicksort(arr,left,pivot-1);
+		randomized_quicksort(arr,pivot+1,right);
 	}
 }
 int main()
@@ -49,7 +64,7 @@ int main()
 	for(int i=0;i<n;i++)
 		printf("%d\n", arr[i]);
 	printf("calling quicksort\n");
-	quicksort(arr,0,n-1);
+	randomized_quicksort(arr,0,n-1);
 	printf("quicksort over\n");
 	for(int i=0;i<n;i++)
 		printf("%d\n", arr[i]);
