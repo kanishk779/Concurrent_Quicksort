@@ -7,6 +7,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <sys/ipc.h>
+#include <time.h>
 #include <sys/shm.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -54,17 +55,30 @@ void quicksort(int *arr, int left, int right)
 		quicksort(arr,pivot+1,right);
 	}
 }
-
+void insertionSort(int * arr, int left,int right)  
+{  
+    int i, key, j;  
+    for (i = left+1; i <= right; i++) 
+    {  
+        key = arr[i];  
+        j = i - 1;  
+        while (j >= 0 && arr[j] > key) 
+        {  
+            arr[j + 1] = arr[j];  
+            j = j - 1;  
+        }  
+        arr[j + 1] = key;  
+    }  
+}
 void concurrent_quicksort(int * arr,int left,int right)
 {
 	if(left < right)
 	{
-		/*
-		* if(right - left + 1 <= 5)
-		* {
-		*	insertion sort
-		* }
-		*/
+		if(right - left + 1 <= 5)
+		{
+			insertionSort(arr,left,right);
+			return ;
+		}
 		int pivot = rand() % (right - left  + 1) + left;
 		swap(&arr[right], &arr[pivot]);
 		int p = partition(arr, left, right);
@@ -116,10 +130,27 @@ int main()
 	
 	for(int i=0;i<n;i++)
 		printf("%d\n", arr[i]);
-	printf("calling quicksort\n");
+	printf("calling  quicksort\n");
+	double begin,conclude,start,end;
+	begin = time(NULL);
+	start = clock();
 	randomized_quicksort(arr,0,n-1);
+	end = clock();
+	conclude = time(NULL);
 	printf("quicksort over\n");
 	for(int i=0;i<n;i++)
 		printf("%d\n", arr[i]);
+	printf("real time used by NORMAL QUICKSORT is %lf \n",conclude - begin);
+	printf("cpu time used by NORMAL QUICKSORT is %lf\n",(end - start)/CLOCKS_PER_SEC );
+
+	begin = time(NULL);
+	start = clock();
+	concurrent_quicksort(arr,0,n-1);
+	end = clock();
+	conclude = time(NULL);
+	printf("real time used by CONCURRENT QUICKSORT is %lf \n",conclude - begin);
+	printf("cpu time used by CONCURRENT QUICKSORT is %lf\n",(end - start)/CLOCKS_PER_SEC );
+	
+	
 	return 0;
 }
